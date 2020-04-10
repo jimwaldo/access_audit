@@ -97,13 +97,10 @@ if __name__ == '__main__':
         huid = access.huid
         if huid in uid_dict:
             a_r = uid_dict[huid]
-            if a_r.check_exclude(class_exclude_s):
-                continue
+            if a_r.check_exclude(class_exclude_s) or  a_r.check_permitted(approved_set):
+                access_allowed.append(ar.AccessInst(access))
             else:
-                if a_r.check_permitted(approved_set):
-                    access_allowed.append(ar.AccessInst(access))
-                else:
-                    access_suspect.append(ar.AccessInst(access))
+                access_suspect.append(ar.AccessInst(access))
 
     write_accessfile('SuspectAccess.csv', access_suspect)
     write_accessfile('AllowedAccess.csv', access_allowed)
