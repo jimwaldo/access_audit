@@ -7,7 +7,11 @@ Created on 3/23/20
 
 Definition of the class that will be used to represent information on all HUID holders. This will be used to
 cross-reference those who go in to buildings with those who are allowed, either because of their job (security,
-custodians) or because they have been authorized by the deans
+custodians) or because they have been authorized by the deans.
+
+Note that as of 3/12, this object is no longer required, as the system works around three sets of files specifying
+HUID and entry status, which means that this could be removed. However, as things may change in the future, we will
+keep this for now.
 """
 import sys, csv, pickle
 
@@ -21,6 +25,12 @@ class EmpRec(object):
         self.role = l[9]
 
     def check_exclude(self, class_exclude_s):
+        """
+        Can be called to see if the employee should be excluded from listing. Originally this was to be used to keep
+        from listing custodians, security, and trades people. These have now been added to the
+        :param class_exclude_s: A set of HUIDs to exclude from reports
+        :return: True if the employee is to be excluded from the reports, false otherwise
+        """
         ex_status= False
         if ('Custod' in self.role) or ('Security' in self.role):
             return True
@@ -29,6 +39,11 @@ class EmpRec(object):
         return ex_status
 
     def check_permitted(self, permitted_s):
+        """
+        Checks to see if the employee is on the permitted set handed in as a parameter
+        :param permitted_s: A set of those permitted to have access
+        :return: True if the employee is in the set, and False otherwise
+        """
         if self.huid in permitted_s:
             return True
         else:

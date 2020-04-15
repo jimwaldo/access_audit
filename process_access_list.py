@@ -27,12 +27,12 @@ BuildingAccess.csv, a listing of each building accessed and the number of times 
 Each of these can be read into a spreadsheet, which allows sorting and visual displays of various kinds.
 """
 
-import employee_rec as er
 import access_rec as ar
 import pickle, csv, sys
 
 uid_fname = 'uid_dict.pkl'
 allow_set_fname = 'allowed_set.pkl'
+grey_set_fname = 'grey_set.pkl'
 
 
 def read_pickle(fname):
@@ -50,6 +50,16 @@ def read_pickle(fname):
 
 
 def write_accessfile(fname, access_l):
+    """
+    Writes an output file, showing who has accessed one of the buildings in the input set of door records. The files
+    all have the same format, but there will be one for those who have been allowed access, another for those whose
+    job requires access, and a third for those who should not be entering the buildings
+    :param fname: Name of the file to write
+    :param access_l: A list of AccessRec objects  for those who have accessed the buildings, along with the building
+    accessed, the date, and the
+    time of access
+    :return: None
+    """
     fout = open(fname, 'w')
     cout = csv.writer(fout)
     cout.writerow(['HUID', 'Name', 'Building', 'Date', 'Time'])
@@ -60,15 +70,24 @@ def write_accessfile(fname, access_l):
 
 
 def write_building_file(fname, building_d):
-    fout = open(fname, 'w')
-    cout = csv.writer(fout)
-    cout.writerow(['building', 'Total Accessed'])
+    """
+    Write a file with the total number of building accesses, by building, from a particular list. This allows a quick
+    check to see what buildings are seeing the most traffic
+    :param fname: Name of the file to write the access records
+    :param building_d: A dictionary, keyed by building name, with values the count of the number of access to the building
+    :return: None
+    """
     build_l = []
     for k, v in building_d.items():
         build_l.append([k, v])
     build_l.sort()
+
+    fout = open(fname, 'w')
+    cout = csv.writer(fout)
+    cout.writerow(['building', 'Total Accessed'])
     cout.writerows(build_l)
     fout.close()
+    return
 
 
 if __name__ == '__main__':
@@ -79,7 +98,7 @@ if __name__ == '__main__':
     # read in the uid->employee_rec dictionary, and the access_set
     uid_dict = read_pickle(uid_fname)
     approved_set = read_pickle(allow_set_fname)
-    class_exclude_s = set(['L', 'U', 'P'])
+    grey_set = read_pickle(grey_set_fname)
 
     fin = open(sys.argv[1], 'r')
     cin = csv.reader(fin)
@@ -88,6 +107,7 @@ if __name__ == '__main__':
     build_access_d = {}
     access_suspect = []
     access_allowed = []
+    access_grey = []
 
     for l in cin:
         access = ar.AccessRec(l)
@@ -95,13 +115,14 @@ if __name__ == '__main__':
             continue
         build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
         huid = access.huid
-        if huid in uid_dict:
-            a_r = uid_dict[huid]
-            if a_r.check_exclude(class_exclude_s) or  a_r.check_permitted(approved_set):
-                access_allowed.append(ar.AccessInst(access))
-            else:
-                access_suspect.append(ar.AccessInst(access))
+        if huid in approved_set:
+            access_allowed.append(access)
+        elif huid in grey_set:
+            access_grey.append(access)
+        else:
+            access_suspect.append(access)
 
     write_accessfile('SuspectAccess.csv', access_suspect)
     write_accessfile('AllowedAccess.csv', access_allowed)
+    write_accessfile('GreyAccess.csv', access_grey)
     write_building_file('BuildingAccess.csv', build_access_d)
