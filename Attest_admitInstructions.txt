@@ -1,0 +1,35 @@
+
+The program attest_admit_check.py takes as input a file containing the access logs as sent to the Dean, and checks to see if those who enter the building have gone through the processes that allow them access to the building. In particular, the program will check to insure that the person has taken the appropriate COVID-related training from the Harvard Educational Portal, has self-attested to lacking symptoms, and (in the future) has had the required testing for presence of the virus.
+
+The program assumes that it is run in a directory/folder that contains the following data files:
+
+    A file, in csv form, containing the HUIDs and the start and end times that the person with that HUID have been clearled by Crimson Clear to enter buildings. This file must be named attest_d.csv. This file comes from the Crimson Clear application, initially by being sent or manually retrieved by the person running the program, but in a future iteration it will be fetched by the attest_admit_check.py program itself.
+
+    A file, in csv form, that contains the HUIDs of the people who have completed the required training. This file is obtained from the Harvard Training Portal, currently it is emailed every morning. This file must be named trained_set.csv
+
+    Optionally, a file named grey_set.pkl that will contain the HUIDs of those who are allowed access to the buildings without passing the other requirements. If this file is missing or empty, no check will be performed on these HUIDs
+
+    (Future) a file containing the HUIDs of all of the people who have undergone the required COVID testing.
+
+The program also requires a csv file containing the door logs for the buildings that will be checked. The name of this file is passed in as a command-line parameter for the program.
+
+From a directory containing the required python files and the needed data files, the program is run from a terminal by entering
+
+python attest_admit_check.py Building_Access_File.csv
+
+(where Building_Access_File.csv is replaced by the name of the actual building access file)
+
+The output of the program are the following set of files, all of which will be written into the directory/folder in which the program is run:
+
+    SuspectAccess.csv, which will contain the HUID, Name, Building, whether the person has undergone the required training, and the date and time of entry, for all those who did not have sufficient rights to enter the building. Once we have the data feed for virus testing, whether or not the person has undergone such testing will also be included.
+
+    AllowedAccess.csv, which will contain all of the information above for those who accessed the building but did have all of the required access characteristics;
+
+    (Optionally) If there is a grey set, the file GreyAccess.csv will contain the above information about all of those who accessed the building who were on the grey set list, and
+
+    BuildingAccess.csv, a listing of the building name and the number of people who accessed that building, whether that access was allowed or not.
+
+All of the output files can be accessed by any standard spreadsheet program, which will allow the user to sort, graph, or otherwise manipulate the data.
+
+Note that the python packages dateutil,pytz, datetime, csv, sys, and os must be installed and reachable. The first two of these are not standard in all distributions, and so may need to be manually installed.
+
