@@ -27,6 +27,7 @@ class AccessRec(object):
         self.datetime = tz.localize(lt)
         self.who = l[2]
         self.trained = False
+        self.permitted = False
 
     def csvwrite(self):
         """
@@ -40,5 +41,9 @@ class AccessRec(object):
 
     def csvwrite_trained(self):
         return ([self.huid, self.who, self.building, self.trained,
+                 '/'.join([str(self.datetime.month), str(self.datetime.day), str(self.datetime.year)]),
+                 ':'.join([str(self.datetime.hour), str(self.datetime.minute)])])
+    def csvwrite_trained_permitted(self):
+        return ([self.huid, self.who, self.building, self.trained, self.permitted,
                  '/'.join([str(self.datetime.month), str(self.datetime.day), str(self.datetime.year)]),
                  ':'.join([str(self.datetime.hour), str(self.datetime.minute)])])

@@ -6,8 +6,7 @@ Created on 3/25/20
 @author waldo
 
 A program that takes as input a file containing the access logs as sent to SEAS and FAS Science, and extracts those
-access that are at the periphery (determined by looking at the name of the card unit and seeing if it contains either
-"Entry" or "Exterior") and checks to see if those who are entering have taken the required training and have
+accesses and checks to see if those who are entering have taken the required training and have
 self-attested to having no COVID-19 symptoms.
 
 The program assumes that a csv file containing a dictionary from huid->interval records (as defined in
@@ -40,6 +39,7 @@ from utilities import read_pickle
 attest_fname = 'attest_d.csv'
 trained_set_fname = 'trained_set.csv'
 grey_set_fname = 'grey_set.pkl'
+allowed_set_fname = 'allow_set.pkl'
 
 
 def write_accessfile(fname, access_l):
@@ -57,7 +57,7 @@ def write_accessfile(fname, access_l):
     cout = csv.writer(fout)
     cout.writerow(['HUID', 'Name', 'Building', 'Trained', 'Date', 'Time'])
     for a in access_l:
-        cout.writerow(a.csvwrite_trained())
+        cout.writerow(a.csvwrite_trained_permitted())
     fout.close()
     return
 
@@ -159,6 +159,10 @@ if __name__ == '__main__':
         grey_set = read_pickle(grey_set_fname)
     else:
         grey_set = set()
+    if os.path.exists(allowed_set_fname):
+        allowed_set = read_pickle(allowed_set_fname)
+    else:
+        allowed_set = set()
 
     fin = open(sys.argv[1], 'r')
     cin = csv.reader(fin)
@@ -175,7 +179,10 @@ if __name__ == '__main__':
         huid = access.huid
         if huid in trained_set:
             access.trained = True
-        if check_access_t(attest_dict, access):
+        if huid in allowed_set:
+            access.permitted = True
+            access_allowed.append(access)
+        elif check_access_t(attest_dict, access):
             access_allowed.append(access)
         elif huid in grey_set:
             access_grey.append(access)
