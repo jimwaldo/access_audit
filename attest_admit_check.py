@@ -39,7 +39,7 @@ from utilities import read_pickle
 attest_fname = 'attest_d.csv'
 trained_set_fname = 'trained_set.csv'
 grey_set_fname = 'grey_set.pkl'
-allowed_set_fname = 'allow_set.pkl'
+allowed_set_fname = 'allowed_set.pkl'
 
 
 def write_accessfile(fname, access_l):
@@ -55,7 +55,7 @@ def write_accessfile(fname, access_l):
     """
     fout = open(fname, 'w')
     cout = csv.writer(fout)
-    cout.writerow(['HUID', 'Name', 'Building', 'Trained', 'Date', 'Time'])
+    cout.writerow(['HUID', 'Name', 'Building', 'Trained', 'Allowed', 'Date', 'Time'])
     for a in access_l:
         cout.writerow(a.csvwrite_trained_permitted())
     fout.close()
@@ -158,10 +158,12 @@ if __name__ == '__main__':
     if os.path.exists(grey_set_fname):
         grey_set = read_pickle(grey_set_fname)
     else:
+        print(grey_set_fname, "Not in directory, empty grey set will be used")
         grey_set = set()
     if os.path.exists(allowed_set_fname):
         allowed_set = read_pickle(allowed_set_fname)
     else:
+        print (allowed_set_fname, "not in directory, empty allowed set will be used")
         allowed_set = set()
 
     fin = open(sys.argv[1], 'r')

@@ -43,6 +43,7 @@ class AccessRec(object):
         return ([self.huid, self.who, self.building, self.trained,
                  '/'.join([str(self.datetime.month), str(self.datetime.day), str(self.datetime.year)]),
                  ':'.join([str(self.datetime.hour), str(self.datetime.minute)])])
+
     def csvwrite_trained_permitted(self):
         return ([self.huid, self.who, self.building, self.trained, self.permitted,
                  '/'.join([str(self.datetime.month), str(self.datetime.day), str(self.datetime.year)]),
