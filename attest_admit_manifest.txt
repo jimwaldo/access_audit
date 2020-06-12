@@ -16,4 +16,5 @@ Date files:
     Door access, in csv form, name passed in as a command argument
     File of those who have self-attested to having no symptoms, in csv, named attest_d.csv
     File of those who have passed training, in csv form, named trained_set.csv
-    (Optional) File of HUIDs of those allowed without other checks, named grey_set.pkl
+    File of those who have been given explicit permission to enter buildings, as a pickled python set of HUIDS, named allowed_set.pkl
+    (Optional) File of a pickled python set of HUIDs of those allowed without other checks, named grey_set.pkl

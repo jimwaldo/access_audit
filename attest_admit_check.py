@@ -38,6 +38,7 @@ from utilities import read_pickle
 
 attest_fname = 'attest_d.csv'
 trained_set_fname = 'trained_set.csv'
+tested_set_fname = 'tested_set.csv'
 grey_set_fname = 'grey_set.pkl'
 allowed_set_fname = 'allowed_set.pkl'
 
@@ -55,9 +56,9 @@ def write_accessfile(fname, access_l):
     """
     fout = open(fname, 'w')
     cout = csv.writer(fout)
-    cout.writerow(['HUID', 'Name', 'Building', 'Trained', 'Allowed', 'Date', 'Time'])
+    cout.writerow(['HUID', 'Name', 'Building', 'Trained', 'Allowed', 'Tested', 'Cleared', 'Date', 'Time'])
     for a in access_l:
-        cout.writerow(a.csvwrite_trained_permitted())
+        cout.writerow(a.csvwrite_trained_permitted_tested())
     fout.close()
     return
 
@@ -103,14 +104,14 @@ def make_attest_d():
     fin.close()
     return ret_d
 
-def make_trained_set():
+def make_qual_set(fname):
     """
     Create a set of HUIDs for the people who have taken the mandated return-to-campus training. This comes from a file
     supplied daily by the Harvard training people, which is a csv file containing one HUID per line. The file must be
     given the name corresponding to the global variable trained_set_fname.
     :return: A set of HUIDs representing those who have taken the mandated training
     """
-    fin = open(trained_set_fname, 'r')
+    fin = open(fname, 'r')
     cin = csv.reader(fin)
     ret_s = set()
     for l in cin:
@@ -151,10 +152,15 @@ if __name__ == '__main__':
         print(attest_fname, "not in directory; program exiting")
         sys.exit(1)
     if os.path.exists(trained_set_fname):
-        trained_set = make_trained_set()
+        trained_set = make_qual_set(trained_set_fname)
     else:
         print(trained_set_fname, "not in directory, program exiting")
         sys.exit(1)
+    if os.path.exists(tested_set_fname):
+        tested_set = make_qual_set(tested_set_fname)
+    else:
+        print (tested_set_fname, 'not in directory, empty test set will be used')
+        tested_set = set()
     if os.path.exists(grey_set_fname):
         grey_set = read_pickle(grey_set_fname)
     else:
@@ -179,15 +185,18 @@ if __name__ == '__main__':
         access = ar.AccessRec(l)
         build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
         huid = access.huid
+        grey = False
         if huid in trained_set:
             access.trained = True
         if huid in allowed_set:
             access.permitted = True
-            access_allowed.append(access)
-        elif check_access_t(attest_dict, access):
-            access_allowed.append(access)
-        elif huid in grey_set:
+        if huid in tested_set:
+            access.tested = True
+        access.attested = check_access_t(attest_dict, access)
+        if huid in grey_set:
             access_grey.append(access)
+        elif access.trained and access.permitted and access.attested:
+            access_allowed.append(access)
         else:
             access_suspect.append(access)
 
