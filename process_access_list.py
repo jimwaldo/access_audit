@@ -105,16 +105,17 @@ if __name__ == '__main__':
     h = next(cin)
 
     build_access_d = {}
+    r_building_access_d = {}
     access_suspect = []
     access_allowed = []
     access_grey = []
 
     for l in cin:
         access = ar.AccessRec(l)
-        if not access.entry:
-            continue
-        build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
         huid = access.huid
+        if huid not in grey_set:
+            r_building_access_d[access.building] = r_building_access_d.setdefault(access.building, 0) + 1
+        build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
         if huid in approved_set:
             access_allowed.append(access)
         elif huid in grey_set:
@@ -126,3 +127,4 @@ if __name__ == '__main__':
     write_accessfile('AllowedAccess.csv', access_allowed)
     write_accessfile('GreyAccess.csv', access_grey)
     write_building_file('BuildingAccess.csv', build_access_d)
+    write_building_file('ResearcherBuildingAccess.csv', r_building_access_d)
