@@ -191,9 +191,8 @@ if __name__ == '__main__':
         bldg = access.building
         if (huid, bldg) not in seen_set:
             seen_set.add((huid, bldg))
-            if huid in grey_set:
-                build_access_d[bldg] = build_access_d.setdefault(bldg, 0) + 1
-            else:
+            build_access_d[bldg] = build_access_d.setdefault(bldg, 0) + 1
+            if huid not in grey_set:
                 r_build_access_d[bldg] = r_build_access_d.setdefault(bldg, 0) + 1
         if huid in trained_set:
             access.trained = True
