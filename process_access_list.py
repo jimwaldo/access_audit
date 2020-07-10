@@ -109,13 +109,18 @@ if __name__ == '__main__':
     access_suspect = []
     access_allowed = []
     access_grey = []
+    seen_set = set()
 
     for l in cin:
         access = ar.AccessRec(l)
         huid = access.huid
-        if huid not in grey_set:
-            r_building_access_d[access.building] = r_building_access_d.setdefault(access.building, 0) + 1
-        build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
+        bldg = access.building
+        if (huid, bldg) not in seen_set:
+            seen_set.add((huid, bldg))
+            if huid not in grey_set:
+                r_building_access_d[access.building] = r_building_access_d.setdefault(access.building, 0) + 1
+            else:
+                build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
         if huid in approved_set:
             access_allowed.append(access)
         elif huid in grey_set:

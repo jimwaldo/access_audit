@@ -1,3 +1,11 @@
+7/10/2020
+
+Added code to only count the combination of an HUID and Entry swipe a single time for any of the building reports, which
+have now been split between a report for everyone on the grey list (custodians, security folks) and everyone else (students,
+researchers, etc.). Also added the code to include whether or not the person who was accessing the buildings had a
+COVID test. This will likely be changed in the future to also require the date of the last test, or perhaps the dates of
+the last several tests. At the moment, it is just a boolean.
+
 5/29/2020
 
 The crimson_code_access.py program is an evolution of the process_access_list.py program. It takes the access files for

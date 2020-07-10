@@ -83,6 +83,7 @@ def write_building_file(fname, building_d):
     fout.close()
     return
 
+
 def make_attest_d():
     """
     Create and return a dictionary keyed by HUID with values a list of a pair of datetime objects, which represent the
@@ -103,6 +104,7 @@ def make_attest_d():
             ret_d[huid].append(v)
     fin.close()
     return ret_d
+
 
 def make_qual_set(fname):
     """
@@ -159,7 +161,7 @@ if __name__ == '__main__':
     if os.path.exists(tested_set_fname):
         tested_set = make_qual_set(tested_set_fname)
     else:
-        print (tested_set_fname, 'not in directory, empty test set will be used')
+        print(tested_set_fname, 'not in directory, empty test set will be used')
         tested_set = set()
     if os.path.exists(grey_set_fname):
         grey_set = read_pickle(grey_set_fname)
@@ -169,7 +171,7 @@ if __name__ == '__main__':
     if os.path.exists(allowed_set_fname):
         allowed_set = read_pickle(allowed_set_fname)
     else:
-        print (allowed_set_fname, "not in directory, empty allowed set will be used")
+        print(allowed_set_fname, "not in directory, empty allowed set will be used")
         allowed_set = set()
 
     fin = open(sys.argv[1], 'r')
@@ -177,15 +179,22 @@ if __name__ == '__main__':
     h = next(cin)
 
     build_access_d = {}
+    r_build_access_d = {}
     access_suspect = []
     access_allowed = []
     access_grey = []
+    seen_set = set()
 
     for l in cin:
         access = ar.AccessRec(l)
-        build_access_d[access.building] = build_access_d.setdefault(access.building, 0) + 1
         huid = access.huid
-        grey = False
+        bldg = access.building
+        if (huid, bldg) not in seen_set:
+            seen_set.add((huid, bldg))
+            if huid in grey_set:
+                build_access_d[bldg] = build_access_d.setdefault(bldg, 0) + 1
+            else:
+                r_build_access_d[bldg] = r_build_access_d.setdefault(bldg, 0) + 1
         if huid in trained_set:
             access.trained = True
         if huid in allowed_set:
@@ -205,3 +214,4 @@ if __name__ == '__main__':
     if len(access_grey) > 0:
         write_accessfile('GreyAccess.csv', access_grey)
     write_building_file('BuildingAccess.csv', build_access_d)
+    write_building_file('ResearchBuildingAccess.csv', r_build_access_d)
