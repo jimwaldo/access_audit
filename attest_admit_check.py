@@ -6,15 +6,18 @@ Created on 3/25/20
 @author waldo
 
 A program that takes as input a file containing the access logs as sent to SEAS and FAS Science, and extracts those
-accesses and checks to see if those who are entering have taken the required training and have
-self-attested to having no COVID-19 symptoms.
+accesses and checks to see if those who are entering have taken the required training, have
+self-attested to having no COVID-19 symptoms, and have been tested for Corona virus.
 
 The program assumes that a csv file containing a dictionary from huid->interval records (as defined in
-interval_rec.py) for those who have self-attested to no symptoms, and a csv file containing the set of HUIDs that have
-completed training that allows return to campus. These need to be in filescalled attest_d.csv and trained_set.csv,
-respectively.
+interval_rec.py) for those who have self-attested to no symptoms, a csv file containing the set of HUIDs that have
+completed training that allows return to campus, and a csv file containing the HUIDs of those who have been tested.
+These need to be in files called attest_d.csv, trained_set.csv, and tested_set.csv respectively. The program also uses
+a file containing the HUIDs of those who are not meant to be tracked (such as security and custodial staff) in the file
+grey_set.pkl (produced by running build_attest_set.py) and a set of those who have been authorized to enter the
+buildings (produced by running build_attest_d.py)
 
-The program produces three files:
+The program produces five files:
 
 SuspectAccess.csv, a listing of the huid, name, building, data and time of access, and whether or not they have taken
  training, for those accessing the building who are not on the authorized for access.
@@ -66,7 +69,8 @@ def write_accessfile(fname, access_l):
 def write_building_file(fname, building_d):
     """
     Write a file with the total number of building accesses, by building, from a particular list. This allows a quick
-    check to see what buildings are seeing the most traffic
+    check to see what buildings are seeing the most traffic. Accesses are de-duplicated; only one combination of
+    (HUID, entrance) will be counted on each run.
     :param fname: Name of the file to write the access records
     :param building_d: A dictionary, keyed by building name, with values the count of the number of access to the building
     :return: None
@@ -147,7 +151,7 @@ if __name__ == '__main__':
         print('Usage: python process_access_list access_list.csv')
         sys.exit(1)
 
-    # read in the uid->employee_rec dictionary, and the access_set
+    # read in the uid->employee_rec dictionary, the trained set, the tested set, and the access_set
     if os.path.exists(attest_fname):
         attest_dict = make_attest_d()
     else:
@@ -178,6 +182,7 @@ if __name__ == '__main__':
     cin = csv.reader(fin)
     h = next(cin)
 
+    # Create and initialize the structures that will keep track of various accesses
     build_access_d = {}
     r_build_access_d = {}
     access_suspect = []

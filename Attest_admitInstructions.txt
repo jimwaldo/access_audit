@@ -27,9 +27,13 @@ The output of the program are the following set of files, all of which will be w
 
     (Optionally) If there is a grey set, the file GreyAccess.csv will contain the above information about all of those who accessed the building who were on the grey set list, and
 
-    BuildingAccess.csv, a listing of the building name and the number of people who accessed that building, whether that access was allowed or not.
+    BuildingAccess.csv, a listing of the building name and the number of all people who accessed that building, whether that access was allowed or not. The listing is de-duplicated, so that only one count is made for any person, entry pair.
 
-All of the output files can be accessed by any standard spreadsheet program, which will allow the user to sort, graph, or otherwise manipulate the data.
+    ResearchBuildingAccess.csv, a listing of the building name and the number of people who accessed that building who are
+not on the grey set (i.e., researchers, facutly, and students), de-duplicated so that only one count is made for each
+person/entry pair.
 
-Note that the python packages dateutil,pytz, datetime, csv, sys, and os must be installed and reachable. The first two of these are not standard in all distributions, and so may need to be manually installed.
+All of the output files can be accessed by any standard spreadsheet program, which will allow the user to sort, graph, or otherwise manipulate the data. They can also be imported into database programs such as sql-lite.
+
+Note that the python packages dateutil, pytz, datetime, csv, sys, and os must be installed and reachable. The first two of these are not standard in all distributions, and so may need to be manually installed.
 
